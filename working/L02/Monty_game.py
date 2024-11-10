@@ -8,10 +8,13 @@ Created on Thu Mar  7 11:36:39 2024
 import numpy as np
 import matplotlib.pyplot as plt
 
-num_games = 10000
+num_games = 10
 win_count_cons = 0
 win_count_swit = 0
 win_count_new = 0
+#prize = ['goat', 'goat', 'car']
+
+#doors = np.random.choice(prize, 3, replace = False)
 doors = np.arange(3)
 
 for i in range(num_games):
@@ -19,10 +22,20 @@ for i in range(num_games):
     car = np.random.choice(doors) #one of the door has a car behind
     first_choice = np.random.choice(doors) #first choice of the player
     
-    monty_door = np.random.choice(np.delete(doors, [first_choice, car])) #Monty proposes a new door (obv without the car)
+    if car == first_choice:
+        monty_door = np.random.choice(np.delete(doors, car))       
+    else: 
+        monty_door = np.random.choice(np.delete(doors, [first_choice, car])) #Monty proposes a new door (obv without the car)
+        
     switcher_choice = np.random.choice(np.delete(doors, [first_choice, monty_door])) #switcher changes door
-    newcomer_choice = np.random.choice(np.delete(doors, monty_door))
+    newcomer_choice = np.random.choice(np.delete(doors, monty_door)) #newcomer chooses a door
     
+    print('car', car)
+    print('first choice', first_choice)
+    print('monty', monty_door) 
+    print('switcher', switcher_choice)
+    print('new', newcomer_choice)
+        
     if first_choice == car:
         win_count_cons += 1
         
@@ -40,6 +53,7 @@ prob_cons = win_count_cons/num_games
 prob_swit = win_count_swit/num_games
 prob_new = win_count_new/num_games
 
+#bar plot
 fig, ax = plt.subplots()
 
 people = ['conserver', 'switcher', 'newcomer']
@@ -53,6 +67,14 @@ ax.set_ylabel('Monty game probability')
 ax.set_title('Probability')
 
 plt.show()
+
+#%%
+
+
+
+
+
+
 
   
 #%% 
