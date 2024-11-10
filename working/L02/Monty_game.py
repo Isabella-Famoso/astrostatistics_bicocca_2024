@@ -8,34 +8,202 @@ Created on Thu Mar  7 11:36:39 2024
 import numpy as np
 import matplotlib.pyplot as plt
 
-num_games = 10
+num_games = 10000
 win_count_cons = 0
 win_count_swit = 0
 win_count_new = 0
-#prize = ['goat', 'goat', 'car']
-
-#doors = np.random.choice(prize, 3, replace = False)
 doors = np.arange(3)
 
 for i in range(num_games):
     
-    car = np.random.choice(doors) #one of the door has a car behind
-    first_choice = np.random.choice(doors) #first choice of the player
+    car = np.random.choice(doors) #One of the door has a car behind
+    first_choice = np.random.choice(doors) #First choice of the player
     
-    if car == first_choice:
-        monty_door = np.random.choice(np.delete(doors, car))       
+    if car == first_choice: #To remove the problem in which the two doors are the same 
+        monty_door = np.random.choice(np.delete(doors, car))  #Monty proposes a new door (obv without the car)
     else: 
         monty_door = np.random.choice(np.delete(doors, [first_choice, car])) #Monty proposes a new door (obv without the car)
         
-    switcher_choice = np.random.choice(np.delete(doors, [first_choice, monty_door])) #switcher changes door
-    newcomer_choice = np.random.choice(np.delete(doors, monty_door)) #newcomer chooses a door
+    switcher_choice = np.random.choice(np.delete(doors, [first_choice, monty_door])) #Switcher changes door
+    newcomer_choice = np.random.choice(np.delete(doors, monty_door)) #Newcomer chooses a door
     
-    print('car', car)
-    print('first choice', first_choice)
-    print('monty', monty_door) 
-    print('switcher', switcher_choice)
-    print('new', newcomer_choice)
+    #we increase the counts 
+    if first_choice == car:
+        win_count_cons += 1
         
+    if switcher_choice == car:
+        win_count_swit += 1   
+        
+    if newcomer_choice == car:
+        win_count_new += 1 
+
+#Compute the probability    
+prob_cons = win_count_cons/num_games
+prob_swit = win_count_swit/num_games
+prob_new = win_count_new/num_games
+
+#Bar plot
+fig, ax = plt.subplots()
+
+people = ['conserver', 'switcher', 'newcomer']
+counts = [prob_cons, prob_swit, prob_new]
+bar_colors = ['tab:red', 'tab:blue','tab:orange']
+
+ax.bar(people, counts, color= bar_colors)
+
+ax.set_ylabel('Monty game probability')
+ax.set_title('Probability')
+
+plt.show()
+
+#%% 100 doors
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+num_games = 10000
+win_count_cons = 0
+win_count_swit = 0
+win_count_new = 0
+doors = np.arange(100)
+
+for i in range(num_games):
+    
+    car = np.random.choice(doors) #One of the door has a car behind
+    first_choice = np.random.choice(doors) #First choice of the player
+    notopened=np.random.choice(np.delete(doors, car)) #To make Monty opens 98 in the case in which car=first_choice 
+
+    if car == first_choice: #To remove the problem in which the two doors are the same 
+       monty_doors = np.delete(doors, [car, notopened])  
+       notpossiblechoices= np.append(monty_doors, car)
+    #If we want only the result we can simple put notpossiblechoices=monty_doors in this case
+    else: 
+        monty_doors = np.delete(doors, [first_choice, car]) #Monty opens the other 98 doors
+        notpossiblechoices= np.append(monty_doors, first_choice)
+     #These are the doors that the switcher cannot open
+    
+    switcher_choice = np.random.choice(np.delete(doors, notpossiblechoices)) #Switcher changes door
+    newcomer_choice = np.random.choice(np.delete(doors, monty_doors)) #Newcomer chooses a door
+
+    if first_choice == car:
+        win_count_cons += 1
+        
+    if switcher_choice == car:
+        win_count_swit += 1   
+        
+    if newcomer_choice == car:
+        win_count_new += 1 
+    
+prob_cons = win_count_cons/num_games
+prob_swit = win_count_swit/num_games
+prob_new = win_count_new/num_games
+
+#Bar plot
+fig, ax = plt.subplots()
+
+people = ['conserver', 'switcher', 'newcomer']
+counts = [prob_cons, prob_swit, prob_new]
+bar_colors = ['tab:red', 'tab:blue','tab:orange']
+
+ax.bar(people, counts, color= bar_colors)
+
+ax.set_ylabel('Monty game probability')
+ax.set_title('Probability for 100 doors')
+
+plt.show()
+
+
+#%% 100 doors same door
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+num_games = 10
+win_count_cons = 0
+win_count_swit = 0
+win_count_new = 0
+doors = np.arange(10)
+
+for i in range(num_games):
+    
+    car = np.random.choice(doors) #one of the door has a car behind
+    first_choice = car #first choice of the player
+    notopened=np.random.choice(np.delete(doors, car))
+
+    monty_doors = np.delete(doors, [car,notopened])  
+    notpossiblechoices= np.append(monty_doors, car)
+      
+    switcher_choice = np.random.choice(np.delete(doors, notpossiblechoices)) #switcher changes door
+    newcomer_choice = np.random.choice(np.delete(doors, monty_doors)) #newcomer chooses a door
+    
+    print('car:', car)
+    print('first:', first_choice)
+    print('notopened:', notopened)
+    print('Monty:', monty_doors)
+    print('switch:', switcher_choice)
+    print('new:', newcomer_choice)
+    
+    if first_choice == car:
+        win_count_cons += 1
+        
+    if switcher_choice == car:
+        win_count_swit += 1   
+        
+    if newcomer_choice == car:
+        win_count_new += 1 
+    
+prob_cons = win_count_cons/num_games
+prob_swit = win_count_swit/num_games
+prob_new = win_count_new/num_games
+
+#bar plot
+fig, ax = plt.subplots()
+
+people = ['conserver', 'switcher', 'newcomer']
+counts = [prob_cons, prob_swit, prob_new]
+#bar_labels = ['red', 'blue', '_red', 'orange']
+bar_colors = ['tab:red', 'tab:blue','tab:orange']
+
+ax.bar(people, counts, color= bar_colors)
+
+ax.set_ylabel('Monty game probability')
+ax.set_title('Probability for 100 doors')
+
+plt.show()
+
+
+
+#%% N doors to choose from and the presenter opens M <= N-2 of them 
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+num_games = 100
+win_count_cons = 0
+win_count_swit = 0
+win_count_new = 0
+N = np.random.randint(1, 10000)
+doors = np.arange(N) #N
+
+for i in range(num_games):
+
+    car = np.random.choice(doors) #One of the door has a car behind
+    first_choice = np.random.choice(doors) #First choice of the player
+    #notopened_doors=np.delete(doors, car)) #To make Monty opens 98 in the case in which car=first_choice 
+
+    if car == first_choice: #To remove the problem in which the two doors are the same 
+        monty_doors = np.delete(doors, [car, notopened])  
+        notpossiblechoices= np.append(monty_doors, car)
+    #If we want only the result we can simple put notpossiblechoices=monty_doors in this case
+    else: 
+        monty_doors = np.delete(doors, [first_choice, car]) #Monty opens the other 98 doors
+        notpossiblechoices= np.append(monty_doors, first_choice)
+        #These are the doors that the switcher cannot open
+        
+    switcher_choice = np.random.choice(np.delete(doors, notpossiblechoices)) #Switcher changes door
+    newcomer_choice = np.random.choice(np.delete(doors, monty_doors)) #Newcomer chooses a door
+
+
     if first_choice == car:
         win_count_cons += 1
         
@@ -64,11 +232,10 @@ bar_colors = ['tab:red', 'tab:blue','tab:orange']
 ax.bar(people, counts, color= bar_colors)
 
 ax.set_ylabel('Monty game probability')
-ax.set_title('Probability')
+ax.set_title('Probability for 100 doors')
 
 plt.show()
 
-#%%
 
 
 
@@ -76,7 +243,11 @@ plt.show()
 
 
 
-  
+
+
+
+
+ 
 #%% 
 prize = ['goat', 'goat', 'car']
 
