@@ -180,22 +180,24 @@ import matplotlib.pyplot as plt
 #cose da fare: sistemare la questione di M, controllare come salva le probabiltà al avriare di M
 #fare grafici (vedi alice)
 #cercare errori
-num_games = 10
-win_count_cons = 0
-win_count_swit = 0
-win_count_new = 0
-N = 100 #i fixed the value of N
-doors = np.arange(N) #N
-M = sorted(np.random.randint(1, N-2) for _ in range(10))
-conservator= np.zeros(100)
-switcher= np.zeros(100)
-newcomer= np.zeros(100)
+num_games = 100 #Number of games 
 
-for j in range(100):
-    #resetting the counters every cicle
+#Initialization 
+conservator_N= np.zeros(19)
+switcher_N= np.zeros(19)
+newcomer_N= np.zeros(19)
+
+#I fixed N, I generate 19 value of M
+N = 100
+Ms = np.linspace(1, 95, 19).astype(int)
+
+for j in range(19):
+    #Resetting the counters every cicle
     win_count_cons = 0
     win_count_swit = 0
     win_count_new = 0
+    
+    doors = np.arange(N) #I assign a number to each doors
     
     for i in range(num_games):
         
@@ -203,17 +205,18 @@ for j in range(100):
         first_choice = np.random.choice(doors) #First choice of the player
 
         if car == first_choice: #To remove the problem in which the two doors are the same 
-           monty_doors = np.random.choice(np.delete(doors, car), M-1, replace=False) #non sicura che vada bene m-1
-           notpossiblechoices= np.append(monty_doors, car)
+           monty_doors = np.random.choice(np.delete(doors, car), Ms[j], replace=False)  #Monty opens the other M doors
+           notpossiblechoices= np.append(monty_doors, car) 
+           #These are the doors that cannot be opened by the player, because they are already opened by Monty or it is the first choice
         #If we want only the result we can simple put notpossiblechoices=monty_doors in this case
         else: 
-            monty_doors = np.random.choice(np.delete(doors, [first_choice, car]), M, replace=False)  #Monty opens the other 98 doors
+            monty_doors = np.random.choice(np.delete(doors, [first_choice, car]), Ms[j], replace=False)  #Monty opens the other M doors
             notpossiblechoices= np.append(monty_doors, first_choice)
+            #These are the doors that cannot be opened by the player, because they are already opened by Monty or it is the first choice
          #These are the doors that the switcher cannot open
         
         switcher_choice = np.random.choice(np.delete(doors, notpossiblechoices)) #Switcher changes door
         newcomer_choice = np.random.choice(np.delete(doors, monty_doors)) #Newcomer chooses a door
-
 
         if first_choice == car:
             win_count_cons += 1
@@ -224,140 +227,110 @@ for j in range(100):
         if newcomer_choice == car:
             win_count_new += 1 
             
-        #print('car:', car)
-        #print('first:', first_choice)
-        # print('notopened:', notopened)
-        #print('Monty:', monty_doors)
-        #print('switch:', switcher_choice)
-        #print('new:', newcomer_choice)
-    
+    #Compute the probabilities        
     prob_cons = win_count_cons/num_games
     prob_swit = win_count_swit/num_games
     prob_new = win_count_new/num_games
     
-    conservator[j]= prob_cons
-    switcher[j]= prob_swit
-    newcomer[j]= prob_new
-  
-#%%
-#plot M vs N
-tab, ax2= plt.subplots(1, 3, figsize=(15, 2.5))
+    #I store the probabilities of each game
+    conservator_N[j]= prob_cons
+    switcher_N[j]= prob_swit
+    newcomer_N[j]= prob_new
+    
+#Plots of the probabilities as a function of M
+fig, ax2 = plt.subplots(nrows=1, ncols=3, figsize=(20, 5))
+fig.suptitle('Probability with fixed N = 100', fontsize= 'large', fontweight = "bold", color= 'crimson')
 
 ax2[0].set_title('Conservator probabilities')
-ax2[0].axis('off')
-table1 = ax2[0].table(conservator, loc='center', cellLoc='center', colLabels=None)
-table1.scale(1, 1.5)
+ax2[0].set(xlabel='value of M', ylabel=' Probability')
+ax2[0].bar(Ms, conservator_N)
+ax2[0].set_xticks(np.arange(0, 100, 10))
 
 ax2[1].set_title('Switcher probabilities')
-ax2[1].axis('off') 
-table2 = ax2[1].(switcher, loc='center', cellLoc='center', colLabels=None)
-table2.scale(1, 1.5)
+ax2[1].set(xlabel='value of M', ylabel=' Probability')
+ax2[1].bar(Ms, switcher_N)
+ax2[1].set_xticks(np.arange(0, 100, 10))
 
 ax2[2].set_title('Newcomer probabilities')
-ax2[2].axis('off')
-table3 = ax2[2].table(newcomer, loc='center', cellLoc='center', colLabels=None)
-table3.scale(1, 1.5)
-
-plt.tight_layout(rect=[0, 0.05, 1, 0.98], w_pad=2.5)
+ax2[2].set(xlabel='value of M', ylabel=' Probability')
+ax2[2].bar(Ms, newcomer_N)
+ax2[2].set_xticks(np.arange(0, 100, 10))
 
 plt.show()
 
+#Initialization 
+conservator_M= np.zeros(19)
+switcher_M= np.zeros(19)
+newcomer_M= np.zeros(19)
 
+#I fixed M, I generate 19 value of N (bigger than M)
+M = 50
+Ns = np.linspace(55, 120, 19).astype(int)
 
-
-
-
-
-
-
-
-
-
- 
-#%% 
-prize = ['goat', 'goat', 'car']
-
-doors = np.random.choice(prize, 3, replace = False)
-print('The prizes behind each door are: ')
-print(doors)
-print('   1\t  2\t  3\n')
-
-first_choice = np.random.randint(0, 3)
-print('The contestant chooses the door: ' + str(first_choice+1))
-
-winning_door = np.where(doors=='car')[0][0]
-
-while(True):
-    open_door = np.random.randint(0, 3)
-    if (open_door != winning_door and open_door != first_choice): break
-print('The game host opens the door: ' + str(open_door+1))
-
-conservator_door = first_choice
-
-while(True): 
-    switcher_door = np.random.randint(0, 3)
-    if (switcher_door != first_choice and switcher_door != open_door): break
+for j in range(19):
+    #Resetting the counters every cicle
+    win_count_cons = 0
+    win_count_swit = 0
+    win_count_new = 0
     
-while(True):
-    newcomer_door = np.random.randint(0, 3)
-    if (newcomer_door != open_door): break
+    doors = np.arange(Ns[j]) #I assign a number to each doors
+    
+    for i in range(num_games):
         
-print('The conservator keeps his door: ' + str(conservator_door+1))
-print('The switcher chooses the other door: ' + str(switcher_door+1))
-print('The newcomer chooses a door: ' + str(newcomer_door+1) + '\n')
+        car = np.random.choice(doors) #One of the door has a car behind
+        first_choice = np.random.choice(doors) #First choice of the player
 
-print('And the winner is...')
+        if car == first_choice: #To remove the problem in which the two doors are the same 
+           monty_doors = np.random.choice(np.delete(doors, car), M, replace=False)  #Monty opens the other M doors
+           notpossiblechoices= np.append(monty_doors, car) 
+           #These are the doors that cannot be opened by the player, because they are already opened by Monty or it is the first choice
+        #If we want only the result we can simple put notpossiblechoices=monty_doors in this case
+        else: 
+            monty_doors = np.random.choice(np.delete(doors, [first_choice, car]), M, replace=False)  #Monty opens the other M doors
+            notpossiblechoices= np.append(monty_doors, first_choice)
+            #These are the doors that cannot be opened by the player, because they are already opened by Monty or it is the first choice
+         #These are the doors that the switcher cannot open
+        
+        switcher_choice = np.random.choice(np.delete(doors, notpossiblechoices)) #Switcher changes door
+        newcomer_choice = np.random.choice(np.delete(doors, monty_doors)) #Newcomer chooses a door
 
-if(conservator_door == winning_door):
-    print('\tconservator WINS!')
-    print('\tswitcher loses...')
-else:
-    print('\tconservator loses...')
-    print('\tswitcher WINS!')
-if(newcomer_door == winning_door):
-    print('\tnewcomer WINS!')
-else:
-    print('\tnewcomer loses...')
+        if first_choice == car:
+            win_count_cons += 1
+            
+        if switcher_choice == car:
+            win_count_swit += 1   
+            
+        if newcomer_choice == car:
+            win_count_new += 1 
+            
+    #Compute the probabilities        
+    prob_cons = win_count_cons/num_games
+    prob_swit = win_count_swit/num_games
+    prob_new = win_count_new/num_games
     
-#%% SOLUZIONE PROF
-import numpy as np
-from tqdm.notebook import tqdm
-import pylab as plt
-plt.rcParams['figure.figsize'] = [8, 8]
-def threedoors(which):
-
-    labels = np.arange(3) # Labels of the three doors
-    doors = np.zeros(3,dtype=int) # Content of three doors
-    doors[np.random.choice(labels)] = 1 # One of them contains the prize, don't know which one
-    choice = np.random.choice(labels) # I pick one door
-    notchosen = np.delete(labels,choice) # These are the remaining doors 
-
-    while True:
-        opened = np.random.choice(notchosen) #One door is opened
-        if doors[opened]==0: # But it's never the winning door
-            other = int(np.delete(labels,[opened,choice])) # This is the other door left
-            break
-       
-    if which == 'switch': # Do you switch? If yes, return content of the other door 
-        return doors[other]
-
-    elif which == 'keep': # If not, return content of the one you picked initially
-        return doors[choice]
- 
-    elif which == 'external': # A third guy picks randomly between the two remaining doors
-        picked = np.random.choice([choice,other])
-        return doors[picked]
+    #I store the probabilities of each game
+    conservator_M[j]= prob_cons
+    switcher_M[j]= prob_swit
+    newcomer_M[j]= prob_new
     
-N  = int(1e5) # Do this many times
-probs = {}
+#Plots of the probabilities as a function of M
+fig, ax3 = plt.subplots(nrows=1, ncols=3, figsize=(20, 5))
+fig.suptitle('Probability with fixed M = 50', fontsize= 'large', fontweight = "bold", color= 'crimson')
 
-for which in tqdm(['switch','keep','external']):
-    events = [threedoors(which) for i in tqdm(range(N))]
-    probs[which] = np.sum(events)/ N
-    
-    # A simple bar chart
-plt.bar([0,1,2], [probs[k] for k in probs.keys()], color='green');
-plt.xticks([0,1,2], probs.keys());
+ax3[0].set_title('Conservator probabilities')
+ax3[0].set(xlabel='value of N', ylabel=' Probability')
+ax3[0].bar(Ns, conservator_M)
+ax3[0].set_xticks(np.arange(50, 130, 10))
 
-for y in [1/3,1/2,2/3]:
-    plt.axhline(y, ls='dotted',c='black')
+ax3[1].set_title('Switcher probabilities')
+ax3[1].set(xlabel='value of N', ylabel=' Probability')
+ax3[1].bar(Ns, switcher_M)
+ax3[1].set_xticks(np.arange(50, 130, 10))
+
+ax3[2].set_title('Newcomer probabilities')
+ax3[2].set(xlabel='value of N', ylabel=' Probability')
+ax3[2].bar(Ns, newcomer_M)
+ax3[2].set_xticks(np.arange(50, 130, 10))
+
+plt.show()
+  
